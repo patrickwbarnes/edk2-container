@@ -20,7 +20,7 @@ RUN curl --fail https://packages.microsoft.com/config/rhel/7/prod.repo \
 
 WORKDIR /src
 
-RUN git clone --depth=1 https://github.com/tianocore/edk2
+RUN git clone -b edk2-stable201908 --depth=1 https://github.com/tianocore/edk2
 
 ENV WORKSPACE=/src/edk2
 
