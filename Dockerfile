@@ -1,7 +1,7 @@
-FROM centos:8
+FROM centos:7
 
 RUN yum -y install epel-release \
- && yum -y --enablerepo=PowerTools install \
+ && yum -y install \
   acpica-tools \
   gcc \
   gcc-c++ \
@@ -9,9 +9,9 @@ RUN yum -y install epel-release \
   libuuid-devel \
   make \
   nasm \
-  python36 \
- && yum clean all \
- && ln -s python3 /usr/bin/python
+  patch \
+  unzip \
+ && yum clean all
 
 RUN curl --fail https://packages.microsoft.com/config/rhel/7/prod.repo \
   > /etc/yum.repos.d/microsoft.repo \
@@ -20,17 +20,30 @@ RUN curl --fail https://packages.microsoft.com/config/rhel/7/prod.repo \
 
 WORKDIR /src
 
-RUN git clone --depth=1 https://github.com/tianocore/edk2
+RUN curl --fail --location -o UDK2014.zip https://downloads.sourceforge.net/project/edk2/UDK2014_Releases/UDK2014.SP1.P1/UDK2014.SP1.P1.Complete.MyWorkSpace.zip \
+ && unzip -d UDK2014 UDK2014.zip \
+ && unzip -d Workspace UDK2014/UDK2014.SP1.P1.MyWorkSpace.zip \
+ && mv Workspace/MyWorkSpace edk2 \
+ && cd edk2 \
+ && tar xf ../UDK2014/BaseTools\(Unix\).tar \
+ && rm -rf UDK2014.zip UDK2014 Workspace
+
+RUN curl --fail --location -O https://www.openssl.org/source/openssl-0.9.8zb.tar.gz \
+ && cd /src/edk2/CryptoPkg/Library/OpensslLib \
+ && tar zxf /src/openssl-0.9.8zb.tar.gz \
+ && cd openssl-0.9.8zb \
+ && patch -p0 -i ../EDKII_openssl-0.9.8zb.patch \
+ && cd .. \
+ && /bin/bash ./Install.sh
 
 ENV WORKSPACE=/src/edk2
 
 WORKDIR /src/edk2
 
-RUN git submodule update --init
 RUN make -C BaseTools
 RUN . ./edksetup.sh \
  && sed -i -r \
-  -e 's/^(TOOL_CHAIN_TAG\s+=\s+).*$/\1GCC5/g' \
+  -e 's/^(TOOL_CHAIN_TAG\s+=\s+).*$/\1GCC48/g' \
   -e 's/^(TARGET_ARCH\s+=\s+).*$/\1X64/g' \
   -e 's/^(ACTIVE_PLATFORM\s+=\s+).*$/\1MdeModulePkg\/MdeModulePkg.dsc/g' \
   Conf/target.txt
