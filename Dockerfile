@@ -11,7 +11,7 @@ RUN yum -y install epel-release \
   nasm \
   python36 \
  && yum clean all \
- && ln -s python3 /usr/bin/python
+ && alternatives --set python /usr/bin/python3
 
 RUN curl --fail https://packages.microsoft.com/config/rhel/7/prod.repo \
   > /etc/yum.repos.d/microsoft.repo \
