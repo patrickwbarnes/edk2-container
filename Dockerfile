@@ -9,7 +9,9 @@ RUN yum -y install epel-release \
   libuuid-devel \
   make \
   nasm \
+  openssl \
   patch \
+  pesign \
   unzip \
  && yum clean all
 
