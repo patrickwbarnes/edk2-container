@@ -9,7 +9,9 @@ RUN yum -y install epel-release \
   libuuid-devel \
   make \
   nasm \
+  openssl \
   patch \
+  pesign \
   python36 \
  && yum clean all \
  && alternatives --set python /usr/bin/python3
