@@ -9,7 +9,9 @@ RUN yum -y install epel-release \
   libuuid-devel \
   make \
   nasm \
+  openssl \
   patch \
+  pesign \
  && yum clean all
 
 RUN curl --fail https://packages.microsoft.com/config/rhel/7/prod.repo \
